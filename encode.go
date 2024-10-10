@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/iwanlebron/pq/oid"
+	"github.com/lib/pq/oid"
 )
 
 var time2400Regex = regexp.MustCompile(`^(24:00(?::00(?:\.0+)?)?)(?:[Z+-].*)?$`)
