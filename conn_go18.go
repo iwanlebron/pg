@@ -6,7 +6,6 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"time"
 )
 
@@ -190,7 +189,7 @@ func (cn *conn) cancel(ctx context.Context) error {
 
 	// Read until EOF to ensure that the server received the cancel.
 	{
-		_, err := io.Copy(ioutil.Discard, c)
+		_, err := io.Copy(io.Discard, c)
 		return err
 	}
 }

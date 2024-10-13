@@ -38,7 +38,6 @@ func (g *GSS) init() error {
 
 // GetInitToken implements the GSS interface.
 func (g *GSS) GetInitToken(host string, service string) ([]byte, error) {
-
 	host, err := canonicalizeHostname(host)
 	if err != nil {
 		return nil, err

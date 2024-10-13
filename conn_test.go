@@ -505,7 +505,6 @@ func TestEmptyResultSetColumns(t *testing.T) {
 	if cols[0] != "a" || cols[1] != "bar" {
 		t.Fatalf("unexpected Columns result %v", cols)
 	}
-
 }
 
 func TestEncodeDecode(t *testing.T) {
@@ -1352,6 +1351,7 @@ FROM (VALUES (0::integer, NULL::text), (1, 'test string')) AS t;`)
 
 	for r.Next() {
 	}
+
 }
 
 func TestCommit(t *testing.T) {

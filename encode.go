@@ -456,7 +456,7 @@ func ParseTimestamp(currentLocation *time.Location, str string) (time.Time, erro
 		tzOff = tzSign * ((tzHours * 60 * 60) + (tzMin * 60) + tzSec)
 	} else if tzStart < len(str) && str[tzStart] == 'Z' {
 		// time zone Z separator indicates UTC is +00
-		remainderIdx += 1
+		remainderIdx++
 	}
 
 	var isoYear int

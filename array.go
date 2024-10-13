@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -19,10 +20,11 @@ var typeSQLScanner = reflect.TypeOf((*sql.Scanner)(nil)).Elem()
 // slice of any dimension.
 //
 // For example:
-//  db.Query(`SELECT * FROM t WHERE id = ANY($1)`, pq.Array([]int{235, 401}))
 //
-//  var x []sql.NullInt64
-//  db.QueryRow(`SELECT ARRAY[235, 401]`).Scan(pq.Array(&x))
+//	db.Query(`SELECT * FROM t WHERE id = ANY($1)`, pq.Array([]int{235, 401}))
+//
+//	var x []sql.NullInt64
+//	db.QueryRow(`SELECT ARRAY[235, 401]`).Scan(pq.Array(&x))
 //
 // Scanning multi-dimensional arrays is not supported.  Arrays where the lower
 // bound is not one (such as `[0:0]={1}') are not supported.
@@ -426,7 +428,7 @@ func (a GenericArray) scanBytes(src []byte, dv reflect.Value) error {
 
 	if len(dims) > 1 {
 		return fmt.Errorf("pq: scanning from multidimensional ARRAY%s is not implemented",
-			strings.Replace(fmt.Sprint(dims), " ", "][", -1))
+			strings.ReplaceAll(fmt.Sprint(dims), " ", "]["))
 	}
 
 	// Treat a zero-dimensional array like an array with a single dimension of zero.
@@ -440,7 +442,7 @@ func (a GenericArray) scanBytes(src []byte, dv reflect.Value) error {
 		case reflect.Array:
 			if rt.Len() != dims[i] {
 				return fmt.Errorf("pq: cannot convert ARRAY%s to %s",
-					strings.Replace(fmt.Sprint(dims), " ", "][", -1), dv.Type())
+					strings.ReplaceAll(fmt.Sprint(dims), " ", "]["), dv.Type())
 			}
 		default:
 			// TODO handle multidimensional
@@ -876,7 +878,7 @@ Close:
 	if err == nil {
 		for _, d := range dims {
 			if (len(elems) % d) != 0 {
-				err = fmt.Errorf("pq: multidimensional arrays must have elements with matching dimensions")
+				err = errors.New("pq: multidimensional arrays must have elements with matching dimensions")
 			}
 		}
 	}
@@ -889,7 +891,7 @@ func scanLinearArray(src, del []byte, typ string) (elems [][]byte, err error) {
 		return nil, err
 	}
 	if len(dims) > 1 {
-		return nil, fmt.Errorf("pq: cannot convert ARRAY%s to %s", strings.Replace(fmt.Sprint(dims), " ", "][", -1), typ)
+		return nil, fmt.Errorf("pq: cannot convert ARRAY%s to %s", strings.ReplaceAll(fmt.Sprint(dims), " ", "]["), typ)
 	}
 	return elems, err
 }

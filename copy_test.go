@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"database/sql/driver"
-	"fmt"
+	"errors"
 	"net"
 	"strings"
 	"testing"
@@ -411,7 +411,7 @@ func TestCopyRespLoopConnectionError(t *testing.T) {
 	retry(t, time.Second*5, func() error {
 		_, err = stmt.Exec()
 		if err == nil {
-			return fmt.Errorf("expected error")
+			return errors.New("expected error")
 		}
 		return nil
 	})

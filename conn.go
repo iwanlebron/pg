@@ -113,6 +113,7 @@ type defaultDialer struct {
 func (d defaultDialer) Dial(network, address string) (net.Conn, error) {
 	return d.d.Dial(network, address)
 }
+
 func (d defaultDialer) DialTimeout(
 	network, address string, timeout time.Duration,
 ) (net.Conn, error) {
@@ -120,6 +121,7 @@ func (d defaultDialer) DialTimeout(
 	defer cancel()
 	return d.DialContext(ctx, network, address)
 }
+
 func (d defaultDialer) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
 	return d.d.DialContext(ctx, network, address)
 }
@@ -134,10 +136,12 @@ type conn struct {
 
 	// Save connection arguments to use during CancelRequest.
 	dialer Dialer
-	opts   values
+
+	opts values
 
 	// Cancellation key data for use with CancelRequest messages.
 	processID int
+
 	secretKey int
 
 	parameterStatus parameterStatus
@@ -525,7 +529,7 @@ func parseOpts(name string, o values) error {
 			for !unicode.IsSpace(r) {
 				if r == '\\' {
 					if r, ok = s.Next(); !ok {
-						return fmt.Errorf(`missing character after backslash`)
+						return errors.New(`missing character after backslash`)
 					}
 				}
 				valRunes = append(valRunes, r)
@@ -538,7 +542,7 @@ func parseOpts(name string, o values) error {
 		quote:
 			for {
 				if r, ok = s.Next(); !ok {
-					return fmt.Errorf(`unterminated quoted string literal in connection string`)
+					return errors.New(`unterminated quoted string literal in connection string`)
 				}
 				switch r {
 				case '\'':
@@ -1097,7 +1101,7 @@ func assignArgsFromOutDrivers(args []driver.Value, outDrivers []driver.Value, po
 				if err != nil {
 					return errors.New("sql out dest parameter type is not supper")
 				}
-				*args[posList[index]].(sql.Out).Dest.(*string) = strValue //value.(string)
+				*args[posList[index]].(sql.Out).Dest.(*string) = strValue // value.(string)
 			case *int64:
 				*args[posList[index]].(sql.Out).Dest.(*int64) = value.(int64)
 			case *float32:
@@ -1122,6 +1126,7 @@ func assignArgsFromOutDrivers(args []driver.Value, outDrivers []driver.Value, po
 
 	return nil
 }
+
 func getStrValue(value driver.Value) (string, error) {
 	result := ""
 	switch value.(type) {
@@ -1741,7 +1746,6 @@ func (st *stmt) exec(v []driver.Value) {
 
 	cn.readBindResponse()
 	cn.postExecuteWorkaround()
-
 }
 
 func (st *stmt) NumInput() int {
@@ -1938,7 +1942,7 @@ func QuoteIdentifier(name string) string {
 	if end > -1 {
 		name = name[:end]
 	}
-	return `"` + strings.Replace(name, `"`, `""`, -1) + `"`
+	return `"` + strings.ReplaceAll(name, `"`, `""`) + `"`
 }
 
 // BufferQuoteIdentifier satisfies the same purpose as QuoteIdentifier, but backed by a
@@ -1949,7 +1953,7 @@ func BufferQuoteIdentifier(name string, buffer *bytes.Buffer) {
 		name = name[:end]
 	}
 	buffer.WriteRune('"')
-	buffer.WriteString(strings.Replace(name, `"`, `""`, -1))
+	buffer.WriteString(strings.ReplaceAll(name, `"`, `""`))
 	buffer.WriteRune('"')
 }
 
@@ -1970,14 +1974,14 @@ func QuoteLiteral(literal string) string {
 	// https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/interfaces/libpq/fe-exec.c
 	//
 	// substitute any single-quotes (') with two single-quotes ('')
-	literal = strings.Replace(literal, `'`, `''`, -1)
+	literal = strings.ReplaceAll(literal, `'`, `''`)
 	// determine if the string has any backslashes (\) in it.
 	// if it does, replace any backslashes (\) with two backslashes (\\)
 	// then, we need to wrap the entire string with a PostgreSQL
 	// C-style escape. Per how "PQEscapeStringInternal" handles this case, we
 	// also add a space before the "E"
 	if strings.Contains(literal, `\`) {
-		literal = strings.Replace(literal, `\`, `\\`, -1)
+		literal = strings.ReplaceAll(literal, `\`, `\\`)
 		literal = ` E'` + literal + `'`
 	} else {
 		// otherwise, we can just wrap the literal with a pair of single quotes
@@ -2369,10 +2373,10 @@ func isUTF8(name string) bool {
 }
 
 func alnumLowerASCII(ch rune) rune {
-	if 'A' <= ch && ch <= 'Z' {
+	if ch >= 'A' && ch <= 'Z' {
 		return ch + ('a' - 'A')
 	}
-	if 'a' <= ch && ch <= 'z' || '0' <= ch && ch <= '9' {
+	if ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' {
 		return ch
 	}
 	return -1 // discard

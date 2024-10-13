@@ -27,8 +27,8 @@ func hQuote(s interface{}) string {
 		panic("not a string or sql.NullString")
 	}
 
-	str = strings.Replace(str, "\\", "\\\\", -1)
-	return `"` + strings.Replace(str, "\"", "\\\"", -1) + `"`
+	str = strings.ReplaceAll(str, "\\", "\\\\")
+	return `"` + strings.ReplaceAll(str, "\"", "\\\"") + `"`
 }
 
 // Scan implements the Scanner interface.

@@ -79,7 +79,6 @@ func (g *GSS) init() error {
 
 // GetInitToken implements the GSS interface.
 func (g *GSS) GetInitToken(host string, service string) ([]byte, error) {
-
 	// Resolve the hostname down to an 'A' record, if required (usually, it is)
 	if g.cli.Config.LibDefaults.DNSCanonicalizeHostname {
 		var err error

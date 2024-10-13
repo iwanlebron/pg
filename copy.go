@@ -30,7 +30,7 @@ func CopyIn(table string, columns ...string) string {
 
 // MakeStmt makes the stmt string for CopyIn and CopyInSchema.
 func makeStmt(buffer *bytes.Buffer, columns ...string) {
-	//s := bytes.NewBufferString()
+	// s := bytes.NewBufferString()
 	for i, col := range columns {
 		if i != 0 {
 			buffer.WriteString(", ")

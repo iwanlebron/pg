@@ -13,9 +13,11 @@ const headerSize = 4
 type fieldDesc struct {
 	// The object ID of the data type.
 	OID oid.Oid
+
 	// The data type size (see pg_type.typlen).
 	// Note that negative values denote variable-width types.
 	Len int
+
 	// The type modifier (see pg_attribute.atttypmod).
 	// The meaning of the modifier is type-specific.
 	Mod int

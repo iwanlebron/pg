@@ -26,7 +26,7 @@ func expectNotification(t *testing.T, ch <-chan *Notification, relname string, e
 		}
 		return nil
 	case <-time.After(1500 * time.Millisecond):
-		return fmt.Errorf("timeout")
+		return errors.New("timeout")
 	}
 }
 

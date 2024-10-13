@@ -83,5 +83,4 @@ func TestNewConnector_Environ(t *testing.T) {
 			t.Fatalf("Getting values from environment variables, for %v expected %s got %s", key, expected, got)
 		}
 	}
-
 }

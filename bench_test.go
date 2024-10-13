@@ -300,6 +300,7 @@ func BenchmarkEncodeByteaHex(b *testing.B) {
 		encode(&parameterStatus{serverVersion: 90000}, testByteString, oid.T_bytea)
 	}
 }
+
 func BenchmarkEncodeByteaEscape(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		encode(&parameterStatus{serverVersion: 84000}, testByteString, oid.T_bytea)
