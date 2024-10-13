@@ -1,4 +1,4 @@
-# pq - A pure Go postgres driver for Go's database/sql package
+# pq - A pure Go Highgo driver for Go's database/sql package
 
 [![GoDoc](https://godoc.org/github.com/lib/pq?status.svg)](https://pkg.go.dev/github.com/lib/pq?tab=doc)
 
